@@ -17,7 +17,25 @@ local args_by_bin = {
   prettier = { "--stdin-filepath", "$FILENAME" },
   prettierd = { "$FILENAME" },
 }
-local disable_rule_comment_locations = { "same_line", "separate_line" }
+
+local prettier_format_options = {
+  "arrow_parens",
+  "bracket_spacing",
+  "embedded_language_formatting",
+  "end_of_line",
+  "html_whitespace_sensitivity",
+  "jsx_bracket_same_line",
+  "jsx_single_quote",
+  "print_width",
+  "prose_wrap",
+  "quote_props",
+  "semi",
+  "single_quote",
+  "tab_width",
+  "trailing_comma",
+  "use_tabs",
+  "vue_indent_script_and_style",
+}
 
 local default_options = {
   _initialized = false,
@@ -82,7 +100,30 @@ function M.setup(user_options)
   validate_options(user_options)
 
   options = vim.tbl_deep_extend("force", options, user_options)
-  options.args = options.bin and args_by_bin[options.bin]
+
+  local args = args_by_bin[options.bin]
+
+  for _, option_name in pairs(prettier_format_options) do
+    local option_value = options[option_name]
+
+    if option_value ~= nil then
+      local is_boolean = type(option_value) == "boolean"
+
+      local arg_name = string.gsub(option_name, "_", "-")
+
+      if is_boolean and not option_value then
+        arg_name = "no-" .. arg_name
+      end
+
+      if is_boolean then
+        table.insert(args, "--" .. arg_name)
+      else
+        table.insert(args, "--" .. arg_name .. "=" .. option_value)
+      end
+    end
+  end
+
+  options.args = args
 
   options._initialized = true
 end
