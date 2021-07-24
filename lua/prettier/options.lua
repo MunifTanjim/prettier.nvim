@@ -1,9 +1,9 @@
 local function tbl_flatten(tbl, result, prefix, depth)
   result = result or {}
-  prefix = prefix or ''
-  depth = type(depth) == 'number' and depth or 1
+  prefix = prefix or ""
+  depth = type(depth) == "number" and depth or 1
   for k, v in pairs(tbl) do
-    if type(v) == 'table' and not vim.tbl_islist(v) and depth < 42 then
+    if type(v) == "table" and not vim.tbl_islist(v) and depth < 42 then
       tbl_flatten(v, result, prefix .. k .. ".", depth + 1)
     else
       result[prefix .. k] = v
@@ -14,8 +14,8 @@ end
 
 local bins = { "prettier", "prettierd" }
 local args_by_bin = {
-  prettier   = { "--stdin-filepath", "$FILENAME" },
-  prettierd = { "$FILENAME" }
+  prettier = { "--stdin-filepath", "$FILENAME" },
+  prettierd = { "$FILENAME" },
 }
 local disable_rule_comment_locations = { "same_line", "separate_line" }
 
@@ -36,7 +36,7 @@ local default_options = {
     "typescript",
     "typescriptreact",
     "yaml",
-  }
+  },
 }
 
 local function get_validate_argmap(tbl, key)
@@ -46,18 +46,18 @@ local function get_validate_argmap(tbl, key)
       function(val)
         return val == nil or vim.tbl_contains(bins, val)
       end,
-      table.concat(bins, ", ")
+      table.concat(bins, ", "),
     },
     ["filetypes"] = {
       tbl["filetypes"],
       "table",
-      true
-    }
+      true,
+    },
   }
 
   if type(key) == "string" then
     return {
-      [key] = argmap[key]
+      [key] = argmap[key],
     }
   end
 

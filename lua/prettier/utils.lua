@@ -14,9 +14,7 @@ function M.config_file_exists()
   local project_root = get_working_directory()
 
   if project_root then
-    return vim.tbl_count(
-      vim.fn.glob(".prettierrc*", true, true)
-    ) > 0
+    return vim.tbl_count(vim.fn.glob(".prettierrc*", true, true)) > 0
   end
 
   return false
@@ -28,7 +26,7 @@ function M.resolve_bin(cmd)
   local project_root = get_working_directory()
 
   if project_root then
-    local local_bin = path_join(project_root, "/node_modules/.bin" ,cmd)
+    local local_bin = path_join(project_root, "/node_modules/.bin", cmd)
     if vim.fn.executable(local_bin) == 1 then
       return local_bin
     end
