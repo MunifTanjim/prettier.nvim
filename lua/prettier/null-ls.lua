@@ -75,7 +75,7 @@ function M.setup()
 
   local prettier_opts = {
     command = command,
-    args = options.get("args"),
+    args = options.get("_args"),
     to_stdin = true,
   }
 

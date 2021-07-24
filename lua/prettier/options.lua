@@ -39,8 +39,8 @@ local prettier_format_options = {
 
 local default_options = {
   _initialized = false,
+  _args = args_by_bin["prettier"],
   bin = "prettier",
-  args = args_by_bin["prettier"],
   filetypes = {
     "css",
     "graphql",
@@ -123,7 +123,7 @@ function M.setup(user_options)
     end
   end
 
-  options.args = args
+  options._args = args
 
   options._initialized = true
 end
