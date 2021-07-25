@@ -1,7 +1,6 @@
 local find_git_ancestor = require("lspconfig.util").find_git_ancestor
 local find_package_json_ancestor = require("lspconfig.util").find_package_json_ancestor
 local path_join = require("lspconfig.util").path.join
-local options = require("prettier.options")
 
 local M = {}
 
@@ -10,7 +9,8 @@ local function get_working_directory()
   return find_git_ancestor(startpath) or find_package_json_ancestor(startpath)
 end
 
-function M.config_file_exists()
+---@return boolean
+local function config_file_exists()
   local project_root = get_working_directory()
 
   if project_root then
@@ -20,8 +20,13 @@ function M.config_file_exists()
   return false
 end
 
+---@return boolean
+function M.prettier_enabled()
+  return config_file_exists()
+end
+
 ---@param cmd string
----@return nill|string
+---@return nil|string
 function M.resolve_bin(cmd)
   local project_root = get_working_directory()
 
