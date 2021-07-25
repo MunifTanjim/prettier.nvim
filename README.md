@@ -79,6 +79,20 @@ prettier.setup({
 })
 ```
 
+**Without LSP Setup**:
+
+If you don't want to do LSP setup, and just use Prettier:
+
+```vim
+-- range_formatting in visual mode
+xmap <Leader>f <Plug>(prettier-format)
+
+-- formatting in normal mode
+nmap <Leader>f <Plug>(prettier-format)
+```
+
+You can also use the **`:Prettier`** command.
+
 ## License
 
 Licensed under the MIT License. Check the [LICENSE](./LICENSE) file for details.
