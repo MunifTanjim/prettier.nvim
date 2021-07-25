@@ -61,6 +61,48 @@ local function get_generator()
   return M._generator
 end
 
+function M.format(method)
+  if not ok then
+    return
+  end
+
+  method = method or "textDocument/formatting"
+
+  local generator = get_generator()
+
+  if not generator then
+    return
+  end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  local params = {
+    bufnr = bufnr,
+    method = method,
+    content = content,
+  }
+
+  if method == "textDocument/rangeFormatting" then
+    params.range = vim.lsp.util.make_given_range_params().range
+  end
+
+  if not M._format then
+    M._format = function(params)
+      local generator_params = require("null-ls.utils").make_params(params, require("null-ls.methods").map[method])
+
+      require("null-ls.generators").run({ generator }, generator_params, nil, function(edits, params)
+        require("null-ls.formatting").apply_edits(edits, params, function(result)
+          if result then
+            vim.lsp.util.apply_text_edits(result)
+          end
+        end)
+      end)
+    end
+  end
+
+  M._format(params)
+end
+
 function M.setup()
   if not ok then
     return
