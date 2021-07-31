@@ -127,7 +127,7 @@ function M.setup()
   null_ls.register({
     filetypes = options.get("filetypes"),
     generator = generator,
-    method = { null_ls.methods.formatting, null_ls.methods.range_formatting },
+    method = { null_ls.methods.FORMATTING, null_ls.methods.RANGE_FORMATTING },
     name = name,
   })
 end
