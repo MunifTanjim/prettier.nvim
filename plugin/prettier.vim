@@ -8,8 +8,8 @@ function! s:LSPMethods(...)
   return join(methods, "\n")
 endfunction
 
-function! s:Format(method)
-  if a:method ==# "textDocument/rangeFormatting"
+function! s:Format(...)
+  if a:0 == 1 && a:1 ==# "textDocument/rangeFormatting"
     lua require("prettier").format("textDocument/rangeFormatting")
   else
     lua require("prettier").format("textDocument/formatting")
