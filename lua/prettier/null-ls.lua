@@ -79,7 +79,6 @@ function M.format(method)
   local params = {
     bufnr = bufnr,
     method = method,
-    content = content,
   }
 
   if method == "textDocument/rangeFormatting" then
@@ -87,16 +86,9 @@ function M.format(method)
   end
 
   if not M._format then
-    M._format = function(params)
-      local generator_params = require("null-ls.utils").make_params(params, require("null-ls.methods").map[method])
-
-      require("null-ls.generators").run({ generator }, generator_params, nil, function(edits, params)
-        require("null-ls.formatting").apply_edits(edits, params, function(result)
-          if result then
-            vim.lsp.util.apply_text_edits(result)
-          end
-        end)
-      end)
+    M._format = function(_params)
+      local generator_params = require("null-ls.utils").make_params(_params, require("null-ls.methods").map[method])
+      require("null-ls.generators").run({ generator }, generator_params, nil, require("null-ls.formatting").apply_edits)
     end
   end
 
