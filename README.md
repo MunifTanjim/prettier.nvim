@@ -10,9 +10,9 @@ Prettier plugin for Neovim's built-in LSP client.
 
 ## Installation
 
-Install the plugins with your preferred plugin manager. For example, with [`vim-plug`](https://github.com/junegunn/vim-plug):
+Install the plugins with your preferred plugin manager. For example, with [`vim-plug`](https://github.com/junegunn/vim-plug) and [`packer.nvim`](https://github.com/wbthomason/packer.nvim):
 
-#### VimPlug
+#### vim-plug
 
 ```vim
 Plug 'neovim/nvim-lspconfig'
@@ -20,7 +20,7 @@ Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
 ```
 
-#### Packer
+#### packer.nvim
 
 ```lua
 use('neovim/nvim-lspconfig')
