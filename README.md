@@ -12,10 +12,20 @@ Prettier plugin for Neovim's built-in LSP client.
 
 Install the plugins with your preferred plugin manager. For example, with [`vim-plug`](https://github.com/junegunn/vim-plug):
 
+#### VimPlug
+
 ```vim
 Plug 'neovim/nvim-lspconfig'
 Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
+```
+
+#### Packer
+
+```lua
+use('neovim/nvim-lspconfig')
+use('jose-elias-alvarez/null-ls.nvim')
+use('MunifTanjim/prettier.nvim')
 ```
 
 ## Setup
@@ -59,7 +69,7 @@ prettier.setup({
     "yaml",
   },
 
-  -- prettier format options
+  -- prettier format options (you can use config files too. ex: `.prettierrc`)
   arrow_parens = "always",
   bracket_spacing = true,
   embedded_language_formatting = "auto",
@@ -84,10 +94,10 @@ prettier.setup({
 If you don't want to do LSP setup, and just use Prettier:
 
 ```vim
--- range_formatting in visual mode
+" range_formatting in visual mode
 xmap <Leader>f <Plug>(prettier-format)
 
--- formatting in normal mode
+" formatting in normal mode
 nmap <Leader>f <Plug>(prettier-format)
 ```
 
