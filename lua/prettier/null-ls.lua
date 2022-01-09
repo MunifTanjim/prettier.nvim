@@ -74,6 +74,58 @@ function M.format(method)
     return
   end
 
+  if not M._format then
+    local u = require("null-ls.utils")
+
+    M._format = function(original_params)
+      local bufnr = original_params.bufnr
+
+      local temp_bufnr = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(temp_bufnr, "eol", vim.api.nvim_buf_get_option(bufnr, "eol"))
+      vim.api.nvim_buf_set_option(temp_bufnr, "fileformat", vim.api.nvim_buf_get_option(bufnr, "fileformat"))
+      vim.api.nvim_buf_set_lines(temp_bufnr, 0, -1, false, vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
+
+      local function callback()
+        local edits = require("null-ls.diff").compute_diff(
+          u.buf.content(bufnr),
+          u.buf.content(temp_bufnr),
+          u.get_line_ending(bufnr)
+        )
+
+        vim.schedule(function()
+          vim.api.nvim_buf_delete(temp_bufnr, { force = true })
+        end)
+
+        local is_actual_edit = not (edits.newText == "" and edits.rangeLength == 0)
+
+        if is_actual_edit then
+          vim.lsp.util.apply_text_edits({ edits }, bufnr)
+        end
+      end
+
+      require("null-ls.generators").run(
+        { generator },
+        u.make_params(original_params, require("null-ls.methods").map[method]),
+        {
+          sequential = true,
+          postprocess = function(edit, params)
+            edit.row = edit.row or 1
+            edit.col = edit.col or 1
+            edit.end_row = edit.end_row or #params.content + 1
+            edit.end_col = edit.end_col or 1
+
+            edit.range = u.range.to_lsp(edit)
+            edit.newText = edit.text
+          end,
+          after_each = function(edits)
+            vim.lsp.util.apply_text_edits(edits, temp_bufnr)
+          end,
+        },
+        callback
+      )
+    end
+  end
+
   local bufnr = vim.api.nvim_get_current_buf()
 
   local params = {
@@ -83,13 +135,6 @@ function M.format(method)
 
   if method == "textDocument/rangeFormatting" then
     params.range = vim.lsp.util.make_given_range_params().range
-  end
-
-  if not M._format then
-    M._format = function(_params)
-      local generator_params = require("null-ls.utils").make_params(_params, require("null-ls.methods").map[method])
-      require("null-ls.generators").run({ generator }, generator_params, nil, require("null-ls.formatting").apply_edits)
-    end
   end
 
   M._format(params)
