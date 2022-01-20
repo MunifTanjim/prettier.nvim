@@ -99,7 +99,7 @@ function M.format(method)
         local is_actual_edit = not (edits.newText == "" and edits.rangeLength == 0)
 
         if is_actual_edit then
-          vim.lsp.util.apply_text_edits({ edits }, bufnr)
+          vim.lsp.util.apply_text_edits({ edits }, bufnr, require("null-ls.client").get_offset_encoding())
         end
       end
 
@@ -118,7 +118,7 @@ function M.format(method)
             edit.newText = edit.text
           end,
           after_each = function(edits)
-            vim.lsp.util.apply_text_edits(edits, temp_bufnr)
+            vim.lsp.util.apply_text_edits(edits, temp_bufnr, require("null-ls.client").get_offset_encoding())
           end,
         },
         callback
