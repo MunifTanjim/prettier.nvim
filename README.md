@@ -89,6 +89,20 @@ prettier.setup({
 })
 ```
 
+You can also supply some options to `null-ls`:
+
+```lua
+prettier.setup({
+  ["null-ls"] = {
+    runtime_condition = function(params)
+      -- return false to skip running prettier
+      return true
+    end,
+    timeout = 5000,
+  }
+})
+```
+
 **Without LSP Setup**:
 
 If you don't want to do LSP setup, and just use Prettier:

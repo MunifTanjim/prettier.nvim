@@ -71,6 +71,16 @@ local function get_validate_argmap(tbl, key)
       "table",
       true,
     },
+    ["null-ls.runtime_condition"] = {
+      tbl["null-ls.runtime_condition"],
+      "function",
+      true,
+    },
+    ["null-ls.timeout"] = {
+      tbl["null-ls.timeout"],
+      "number",
+      true,
+    },
   }
 
   if type(key) == "string" then

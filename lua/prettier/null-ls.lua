@@ -56,6 +56,8 @@ local function get_generator()
       return args
     end,
     to_stdin = true,
+    runtime_condition = options.get("null-ls.runtime_condition"),
+    timeout = options.get("null-ls.timeout"),
   })
 
   return M._generator
