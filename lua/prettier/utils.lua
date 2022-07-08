@@ -14,7 +14,8 @@ local function config_file_exists()
   local project_root = get_working_directory()
 
   if project_root then
-    return vim.tbl_count(vim.fn.glob(".prettierrc*", true, true)) > 0
+    return vim.tbl_count(vim.fn.glob(".prettierrc*", true, true)) > 0 or
+      vim.tbl_count(vim.fn.glob("prettier.config.js", true, true)) > 0
   end
 
   return false
