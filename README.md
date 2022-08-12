@@ -10,9 +10,9 @@ Prettier plugin for Neovim's built-in LSP client.
 
 ## Installation
 
-Install the plugins with your preferred plugin manager. For example, with [`vim-plug`](https://github.com/junegunn/vim-plug):
+Install the plugins with your preferred plugin manager. For example:
 
-#### VimPlug
+**With [`vim-plug`](https://github.com/junegunn/vim-plug)**
 
 ```vim
 Plug 'neovim/nvim-lspconfig'
@@ -20,7 +20,7 @@ Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
 ```
 
-#### Packer
+**With [`packer.nvim`](https://github.com/wbthomason/packer.nvim)**
 
 ```lua
 use('neovim/nvim-lspconfig')
@@ -30,18 +30,40 @@ use('MunifTanjim/prettier.nvim')
 
 ## Setup
 
-`prettier.nvim` needs to be initialized with the `require("prettier").setup()` function.
+### Setting up `null-ls`
 
-For example:
+For Latest Neovim:
 
 ```lua
 local null_ls = require("null-ls")
-local prettier = require("prettier")
+
+null_ls.setup({
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentFormattingProvider then
+      vim.cmd("nnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.formatting()<CR>")
+
+      -- format on save
+      vim.cmd("autocmd BufWritePost <buffer> lua vim.lsp.buf.formatting()")
+    end
+
+    if client.server_capabilities.documentRangeFormattingProvider then
+      vim.cmd("xnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.range_formatting({})<CR>")
+    end
+  end,
+})
+```
+
+<details>
+<summary>For Older Neovim:</summary>
+
+```lua
+local null_ls = require("null-ls")
 
 null_ls.setup({
   on_attach = function(client, bufnr)
     if client.resolved_capabilities.document_formatting then
       vim.cmd("nnoremap <silent><buffer> <Leader>f :lua vim.lsp.buf.formatting()<CR>")
+
       -- format on save
       vim.cmd("autocmd BufWritePost <buffer> lua vim.lsp.buf.formatting()")
     end
@@ -51,6 +73,16 @@ null_ls.setup({
     end
   end,
 })
+```
+</details>
+
+### Setting Up `prettier.nvim`
+
+`prettier.nvim` needs to be initialized with the `require("prettier").setup()` function.
+All the settings are optional.
+
+```lua
+local prettier = require("prettier")
 
 prettier.setup({
   bin = 'prettier', -- or `prettierd`
@@ -68,24 +100,6 @@ prettier.setup({
     "typescriptreact",
     "yaml",
   },
-
-  -- prettier format options (you can use config files too. ex: `.prettierrc`)
-  arrow_parens = "always",
-  bracket_spacing = true,
-  embedded_language_formatting = "auto",
-  end_of_line = "lf",
-  html_whitespace_sensitivity = "css",
-  jsx_bracket_same_line = false,
-  jsx_single_quote = false,
-  print_width = 80,
-  prose_wrap = "preserve",
-  quote_props = "as-needed",
-  semi = true,
-  single_quote = false,
-  tab_width = 2,
-  trailing_comma = "es5",
-  use_tabs = false,
-  vue_indent_script_and_style = false,
 })
 ```
 
@@ -103,19 +117,52 @@ prettier.setup({
 })
 ```
 
-**Without LSP Setup**:
+You can pass [Prettier's format options](https://prettier.io/docs/en/options.html) too.
+They are passed to the `prettier` CLI.
+
+```lua
+prettier.setup({
+  arrow_parens = "always",
+  bracket_spacing = true,
+  bracket_same_line = false,
+  embedded_language_formatting = "auto",
+  end_of_line = "lf",
+  html_whitespace_sensitivity = "css",
+  -- jsx_bracket_same_line = false,
+  jsx_single_quote = false,
+  print_width = 80,
+  prose_wrap = "preserve",
+  quote_props = "as-needed",
+  semi = true,
+  single_attribute_per_line = false,
+  single_quote = false,
+  tab_width = 2,
+  trailing_comma = "es5",
+  use_tabs = false,
+  vue_indent_script_and_style = false,
+})
+```
+
+_**Note**: You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config
+file is present in your project directory._
+
+## Setup without LSP
 
 If you don't want to do LSP setup, and just use Prettier:
 
-```vim
-" range_formatting in visual mode
-xmap <Leader>f <Plug>(prettier-format)
+**Keybindings**
 
+```vim
 " formatting in normal mode
 nmap <Leader>f <Plug>(prettier-format)
+
+" range_formatting in visual mode
+xmap <Leader>f <Plug>(prettier-format)
 ```
 
-You can also use the **`:Prettier`** command.
+**Commands**
+
+`:Prettier` command will format the current buffer.
 
 ## License
 

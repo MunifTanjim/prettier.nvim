@@ -21,6 +21,7 @@ local args_by_bin = {
 local prettier_format_options = {
   "arrow_parens",
   "bracket_spacing",
+  "bracket_same_line",
   "embedded_language_formatting",
   "end_of_line",
   "html_whitespace_sensitivity",
@@ -30,6 +31,7 @@ local prettier_format_options = {
   "prose_wrap",
   "quote_props",
   "semi",
+  "single_attribute_per_line",
   "single_quote",
   "tab_width",
   "trailing_comma",
