@@ -104,10 +104,6 @@ local function validate_options(user_options)
   vim.validate(get_validate_argmap(user_options))
 end
 
-local options = vim.deepcopy(tbl_flatten(default_options))
-
-local M = {}
-
 local function to_prettier_arg(option_name, option_value)
   local is_boolean = type(option_value) == "boolean"
 
@@ -124,6 +120,10 @@ local function to_prettier_arg(option_name, option_value)
   end
 end
 
+local options = vim.deepcopy(tbl_flatten(default_options))
+
+local M = {}
+
 function M.setup(user_options)
   if options._initialized then
     return
@@ -138,7 +138,11 @@ function M.setup(user_options)
   local args = args_by_bin[options.bin]
 
   for _, option_name in ipairs(prettier_cli_options) do
-    local option_value = options[option_name] or default_prettier_cli_options[option_name]
+    local option_value = options[option_name]
+    if option_value == nil then
+      option_value = default_prettier_cli_options[option_name]
+    end
+
     if option_value ~= nil then
       local arg = to_prettier_arg(option_name, option_value)
       table.insert(args, arg)
