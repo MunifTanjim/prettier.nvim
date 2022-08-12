@@ -18,7 +18,9 @@ local args_by_bin = {
   prettierd = { "$FILENAME" },
 }
 
-local prettier_format_options = {
+local prettier_cli_options = {
+  "config_precedence",
+
   "arrow_parens",
   "bracket_spacing",
   "bracket_same_line",
@@ -37,6 +39,10 @@ local prettier_format_options = {
   "trailing_comma",
   "use_tabs",
   "vue_indent_script_and_style",
+}
+
+local default_prettier_cli_options = {
+  config_precedence = "prefer-file",
 }
 
 local default_options = {
@@ -102,6 +108,22 @@ local options = vim.deepcopy(tbl_flatten(default_options))
 
 local M = {}
 
+local function to_prettier_arg(option_name, option_value)
+  local is_boolean = type(option_value) == "boolean"
+
+  local arg_name = string.gsub(option_name, "_", "-")
+
+  if is_boolean and not option_value then
+    arg_name = "no-" .. arg_name
+  end
+
+  if is_boolean then
+    return "--" .. arg_name
+  else
+    return "--" .. arg_name .. "=" .. option_value
+  end
+end
+
 function M.setup(user_options)
   if options._initialized then
     return
@@ -115,23 +137,11 @@ function M.setup(user_options)
 
   local args = args_by_bin[options.bin]
 
-  for _, option_name in pairs(prettier_format_options) do
-    local option_value = options[option_name]
-
+  for _, option_name in ipairs(prettier_cli_options) do
+    local option_value = options[option_name] or default_prettier_cli_options[option_name]
     if option_value ~= nil then
-      local is_boolean = type(option_value) == "boolean"
-
-      local arg_name = string.gsub(option_name, "_", "-")
-
-      if is_boolean and not option_value then
-        arg_name = "no-" .. arg_name
-      end
-
-      if is_boolean then
-        table.insert(args, "--" .. arg_name)
-      else
-        table.insert(args, "--" .. arg_name .. "=" .. option_value)
-      end
+      local arg = to_prettier_arg(option_name, option_value)
+      table.insert(args, arg)
     end
   end
 

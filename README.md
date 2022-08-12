@@ -117,7 +117,7 @@ prettier.setup({
 })
 ```
 
-You can pass [Prettier's format options](https://prettier.io/docs/en/options.html) too.
+You can set [Prettier's options](https://prettier.io/docs/en/options.html) too.
 They are passed to the `prettier` CLI.
 
 ```lua
@@ -141,6 +141,17 @@ prettier.setup({
   use_tabs = false,
   vue_indent_script_and_style = false,
 })
+```
+
+By default these options are only used if prettier config file is not found.
+If you want to change that behavior, you can use the following option:
+
+```lua
+prettier.setup({
+  -- https://prettier.io/docs/en/cli.html#--config-precedence
+  config_precedence = "prefer-file" -- or "cli-override" or "file-override"
+})
+
 ```
 
 _**Note**: You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config
