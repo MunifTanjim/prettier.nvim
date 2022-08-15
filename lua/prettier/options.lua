@@ -18,6 +18,11 @@ local args_by_bin = {
   prettierd = { "$FILENAME" },
 }
 
+local bin_support_prettier_cli_options = {
+  prettier = true,
+  prettierd = false,
+}
+
 local prettier_cli_options = {
   "config_precedence",
 
@@ -135,18 +140,24 @@ function M.setup(user_options)
 
   options = vim.tbl_deep_extend("force", options, user_options)
 
-  local args = args_by_bin[options.bin]
+  local args = {}
 
-  for _, option_name in ipairs(prettier_cli_options) do
-    local option_value = options[option_name]
-    if option_value == nil then
-      option_value = default_prettier_cli_options[option_name]
-    end
+  if bin_support_prettier_cli_options[options.bin] then
+    for _, option_name in ipairs(prettier_cli_options) do
+      local option_value = options[option_name]
+      if option_value == nil then
+        option_value = default_prettier_cli_options[option_name]
+      end
 
-    if option_value ~= nil then
-      local arg = to_prettier_arg(option_name, option_value)
-      table.insert(args, arg)
+      if option_value ~= nil then
+        local arg = to_prettier_arg(option_name, option_value)
+        table.insert(args, arg)
+      end
     end
+  end
+
+  for _, arg in ipairs(args_by_bin[options.bin]) do
+    table.insert(args, arg)
   end
 
   options._args = args

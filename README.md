@@ -154,8 +154,9 @@ prettier.setup({
 
 ```
 
-_**Note**: You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config
-file is present in your project directory._
+_**Note**:_ 
+  - _You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config file is present in your project directory._
+  - _Prettier CLI options are not supported by `prettierd`: [`fsouza/prettierd#237`](https://github.com/fsouza/prettierd/issues/237)._
 
 ## Setup without LSP
 
