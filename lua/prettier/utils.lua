@@ -45,4 +45,23 @@ function M.resolve_bin(cmd)
   return nil
 end
 
+function M.tbl_flatten(tbl, should_flatten, result, prefix, depth)
+  should_flatten = should_flatten or function(_, value)
+    return not vim.tbl_islist(value) and depth < 42
+  end
+
+  result = result or {}
+  prefix = prefix or ""
+  depth = type(depth) == "number" and depth or 1
+  for k, v in pairs(tbl) do
+    local key = prefix .. k
+    if type(v) == "table" and should_flatten(key, v, depth) then
+      M.tbl_flatten(v, should_flatten, result, key .. ".", depth + 1)
+    else
+      result[key] = v
+    end
+  end
+  return result
+end
+
 return M
