@@ -1,5 +1,6 @@
 local ok, null_ls = pcall(require, "null-ls")
 
+local cli_options = require("prettier.cli-options")
 local options = require("prettier.options")
 local utils = require("prettier.utils")
 
@@ -23,16 +24,24 @@ local function get_generator()
     return
   end
 
-  local command = utils.resolve_bin(options.get("bin"))
+  local bin = options.get("bin") --[[@as string]]
+  local command = utils.resolve_bin(bin)
 
   if not command then
     return
   end
 
+  local cli_args = options.get("_args")
+  if cli_options.is_supported(bin) then
+    for _, arg in ipairs(cli_options.to_args(options.get("cli_options"))) do
+      table.insert(cli_args, arg)
+    end
+  end
+
   M._generator = null_ls.formatter({
     command = command,
     args = function(params)
-      local args = options.get("_args")
+      local args = vim.deepcopy(cli_args)
 
       if params.lsp_method == "textDocument/formatting" then
         return args

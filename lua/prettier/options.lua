@@ -1,15 +1,9 @@
-local cli_options = require("prettier.cli-options")
 local u = require("prettier.utils")
 
 local bins = { "prettier", "prettierd" }
 local args_by_bin = {
   prettier = { "--stdin-filepath", "$FILENAME" },
   prettierd = { "$FILENAME" },
-}
-
-local bin_support_prettier_cli_options = {
-  prettier = true,
-  prettierd = false,
 }
 
 local top_level_cli_options = {
@@ -133,13 +127,6 @@ function M.setup(user_options)
   end
 
   local args = {}
-
-  if bin_support_prettier_cli_options[options.bin] then
-    local cli_args = cli_options.to_args(options.cli_options)
-    for _, arg in ipairs(cli_args) do
-      table.insert(args, arg)
-    end
-  end
 
   for _, arg in ipairs(args_by_bin[options.bin]) do
     table.insert(args, arg)
