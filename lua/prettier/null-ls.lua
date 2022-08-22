@@ -16,7 +16,7 @@ local function create_generator(opts)
   local cli_options = opts.cli_options or {}
   local null_ls_options = opts["null-ls"] or {}
 
-  local command = utils.resolve_bin(bin)
+  local command = utils.resolve_bin(bin, opts.bin_preference)
 
   if not command then
     return
@@ -78,6 +78,7 @@ local function create_formatter(opts)
 
   local generator = create_generator({
     bin = opts.bin,
+    bin_preference = opts.bin_preference,
     cli_options = opts.cli_options,
     ["null-ls"] = opts["null-ls"],
   })

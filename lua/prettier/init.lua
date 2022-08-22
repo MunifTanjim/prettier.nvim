@@ -5,7 +5,9 @@ local M = {}
 
 function M.setup(user_options)
   options.setup(user_options)
-  null_ls.setup()
+  vim.schedule(function()
+    null_ls.setup()
+  end)
 end
 
 function M.format(method)
