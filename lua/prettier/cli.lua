@@ -1,4 +1,8 @@
-local mod = {}
+local cli_args = {}
+
+local cli = {
+  args = cli_args,
+}
 
 local supported_bin = {
   prettier = true,
@@ -7,12 +11,14 @@ local supported_bin = {
 
 ---@param bin string
 ---@return boolean is_supported
-function mod.is_supported(bin)
+function cli_args.supports_options(bin)
   return supported_bin[bin] or false
 end
 
+---@param option_name string
+---@param option_value boolean|number|string
 ---@return string arg
-function mod.to_arg(option_name, option_value)
+function cli_args.from_option(option_name, option_value)
   local is_boolean = type(option_value) == "boolean"
 
   local arg_name = string.gsub(option_name, "_", "-")
@@ -28,16 +34,17 @@ function mod.to_arg(option_name, option_value)
   return "--" .. arg_name .. "=" .. option_value
 end
 
+---@param options table<string, boolean|number|string>
 ---@return string[] args
-function mod.to_args(options)
+function cli_args.from_options(options)
   local args = {}
 
   for option_name, option_value in pairs(options) do
-    local arg = mod.to_arg(option_name, option_value)
+    local arg = cli_args.from_option(option_name, option_value)
     table.insert(args, arg)
   end
 
   return args
 end
 
-return mod
+return cli

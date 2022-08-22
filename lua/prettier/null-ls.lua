@@ -1,6 +1,6 @@
 local ok, null_ls = pcall(require, "null-ls")
 
-local cli_options = require("prettier.cli-options")
+local cli = require("prettier.cli")
 local options = require("prettier.options")
 local utils = require("prettier.utils")
 
@@ -33,10 +33,10 @@ local function get_generator()
 
   local format_cli_args = options.get("_args")
   local range_format_cli_args = options.get("_args")
-  if cli_options.is_supported(bin) then
-    local cli_opts = options.get("cli_options")
+  if cli.args.supports_options(bin) then
+    local cli_options = options.get("cli_options")
 
-    for _, arg in ipairs(cli_options.to_args(cli_opts)) do
+    for _, arg in ipairs(cli.args.from_options(cli_options)) do
       table.insert(format_cli_args, arg)
     end
 
@@ -45,7 +45,7 @@ local function get_generator()
             `--config-precedence=prefer-file` is problematic with cli options
             for range formatting.
     --]]
-    if cli_opts.config_precedence ~= "prefer-file" then
+    if cli_options.config_precedence ~= "prefer-file" then
       range_format_cli_args = vim.deepcopy(format_cli_args)
     end
   end
