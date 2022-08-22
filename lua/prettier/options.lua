@@ -1,3 +1,4 @@
+local cli_options = require("prettier.cli-options")
 local u = require("prettier.utils")
 
 local bins = { "prettier", "prettierd" }
@@ -11,7 +12,7 @@ local bin_support_prettier_cli_options = {
   prettierd = false,
 }
 
-local prettier_cli_options = {
+local top_level_cli_options = {
   "config_precedence",
 
   "arrow_parens",
@@ -34,10 +35,6 @@ local prettier_cli_options = {
   "vue_indent_script_and_style",
 }
 
-local default_prettier_cli_options = {
-  config_precedence = "prefer-file",
-}
-
 local default_options = {
   _initialized = false,
   _args = args_by_bin["prettier"],
@@ -56,6 +53,9 @@ local default_options = {
     "typescriptreact",
     "yaml",
   },
+  cli_options = {
+    config_precedence = "prefer-file",
+  },
 }
 
 local function get_validate_argmap(tbl, key)
@@ -68,6 +68,11 @@ local function get_validate_argmap(tbl, key)
       table.concat(bins, ", "),
     },
     ["filetypes"] = {
+      tbl["filetypes"],
+      "table",
+      true,
+    },
+    ["cli_options"] = {
       tbl["filetypes"],
       "table",
       true,
@@ -97,23 +102,14 @@ local function validate_options(user_options)
   vim.validate(get_validate_argmap(user_options))
 end
 
-local function to_prettier_arg(option_name, option_value)
-  local is_boolean = type(option_value) == "boolean"
-
-  local arg_name = string.gsub(option_name, "_", "-")
-
-  if is_boolean and not option_value then
-    arg_name = "no-" .. arg_name
-  end
-
-  if is_boolean then
-    return "--" .. arg_name
-  else
-    return "--" .. arg_name .. "=" .. option_value
-  end
+local function should_flatten(key, value, depth)
+  local skip_key = {
+    cli_options = true,
+  }
+  return not skip_key[key] and not vim.tbl_islist(value) and depth < 7
 end
 
-local options = vim.deepcopy(u.tbl_flatten(default_options))
+local options = vim.deepcopy(u.tbl_flatten(default_options, should_flatten))
 
 local M = {}
 
@@ -122,25 +118,26 @@ function M.setup(user_options)
     return
   end
 
-  user_options = u.tbl_flatten(user_options)
+  user_options = u.tbl_flatten(user_options, should_flatten)
 
   validate_options(user_options)
 
-  options = vim.tbl_deep_extend("force", options, user_options)
+  options = vim.tbl_deep_extend("force", options, user_options) --[[@as table]]
+
+  for _, option_name in ipairs(top_level_cli_options) do
+    if options[option_name] then
+      -- @todo: log deprecation notice
+      options.cli_options[option_name] = options[option_name]
+      options[option_name] = nil
+    end
+  end
 
   local args = {}
 
   if bin_support_prettier_cli_options[options.bin] then
-    for _, option_name in ipairs(prettier_cli_options) do
-      local option_value = options[option_name]
-      if option_value == nil then
-        option_value = default_prettier_cli_options[option_name]
-      end
-
-      if option_value ~= nil then
-        local arg = to_prettier_arg(option_name, option_value)
-        table.insert(args, arg)
-      end
+    local cli_args = cli_options.to_args(options.cli_options)
+    for _, arg in ipairs(cli_args) do
+      table.insert(args, arg)
     end
   end
 
