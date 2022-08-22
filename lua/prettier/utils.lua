@@ -64,4 +64,12 @@ function M.tbl_flatten(tbl, should_flatten, result, prefix, depth)
   return result
 end
 
+function M.list_to_map(list)
+  local map = {}
+  for _, key in ipairs(list) do
+    map[key] = true
+  end
+  return map
+end
+
 return M

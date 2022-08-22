@@ -137,8 +137,14 @@ local function create_formatter(opts)
     )
   end
 
+  local filetypes = opts.filetypes and utils.list_to_map(opts.filetypes)
+
   return function(method)
     local bufnr = vim.api.nvim_get_current_buf()
+
+    if filetypes and not filetypes[vim.api.nvim_buf_get_option(bufnr, "filetype")] then
+      return
+    end
 
     local params = {
       bufnr = bufnr,
