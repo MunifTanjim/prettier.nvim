@@ -1,5 +1,16 @@
 local mod = {}
 
+local supported_bin = {
+  prettier = true,
+  prettierd = false,
+}
+
+---@param bin string
+---@return boolean is_supported
+function mod.is_supported(bin)
+  return supported_bin[bin] or false
+end
+
 ---@return string arg
 function mod.to_arg(option_name, option_value)
   local is_boolean = type(option_value) == "boolean"
