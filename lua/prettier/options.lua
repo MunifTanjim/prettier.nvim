@@ -1,16 +1,4 @@
-local function tbl_flatten(tbl, result, prefix, depth)
-  result = result or {}
-  prefix = prefix or ""
-  depth = type(depth) == "number" and depth or 1
-  for k, v in pairs(tbl) do
-    if type(v) == "table" and not vim.tbl_islist(v) and depth < 42 then
-      tbl_flatten(v, result, prefix .. k .. ".", depth + 1)
-    else
-      result[prefix .. k] = v
-    end
-  end
-  return result
-end
+local u = require("prettier.utils")
 
 local bins = { "prettier", "prettierd" }
 local args_by_bin = {
@@ -125,7 +113,7 @@ local function to_prettier_arg(option_name, option_value)
   end
 end
 
-local options = vim.deepcopy(tbl_flatten(default_options))
+local options = vim.deepcopy(u.tbl_flatten(default_options))
 
 local M = {}
 
@@ -134,7 +122,7 @@ function M.setup(user_options)
     return
   end
 
-  user_options = tbl_flatten(user_options)
+  user_options = u.tbl_flatten(user_options)
 
   validate_options(user_options)
 
