@@ -4,6 +4,17 @@ local cli = {
   args = cli_args,
 }
 
+local base_args_by_bin = {
+  prettier = { "--stdin-filepath", "$FILENAME" },
+  prettierd = { "$FILENAME" },
+}
+
+---@param bin string
+---@return string[] base_args
+function cli.get_base_args(bin)
+  return vim.deepcopy(base_args_by_bin[bin])
+end
+
 local supported_bin = {
   prettier = true,
   prettierd = false,

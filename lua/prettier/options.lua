@@ -1,10 +1,7 @@
+local cli = require("prettier.cli")
 local u = require("prettier.utils")
 
 local bins = { "prettier", "prettierd" }
-local args_by_bin = {
-  prettier = { "--stdin-filepath", "$FILENAME" },
-  prettierd = { "$FILENAME" },
-}
 
 local top_level_cli_options = {
   "config_precedence",
@@ -31,7 +28,6 @@ local top_level_cli_options = {
 
 local default_options = {
   _initialized = false,
-  _args = args_by_bin["prettier"],
   bin = "prettier",
   filetypes = {
     "css",
@@ -125,14 +121,6 @@ function M.setup(user_options)
       options[option_name] = nil
     end
   end
-
-  local args = {}
-
-  for _, arg in ipairs(args_by_bin[options.bin]) do
-    table.insert(args, arg)
-  end
-
-  options._args = args
 
   options._initialized = true
 end

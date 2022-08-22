@@ -31,8 +31,8 @@ local function get_generator()
     return
   end
 
-  local format_cli_args = options.get("_args")
-  local range_format_cli_args = options.get("_args")
+  local format_cli_args = cli.get_base_args(bin)
+  local range_format_cli_args = cli.get_base_args(bin)
   if cli.args.supports_options(bin) then
     local cli_options = options.get("cli_options")
 
