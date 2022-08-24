@@ -31,21 +31,33 @@ local function get_generator()
     return
   end
 
-  local cli_args = options.get("_args")
+  local format_cli_args = options.get("_args")
+  local range_format_cli_args = options.get("_args")
   if cli_options.is_supported(bin) then
-    for _, arg in ipairs(cli_options.to_args(options.get("cli_options"))) do
-      table.insert(cli_args, arg)
+    local cli_opts = options.get("cli_options")
+
+    for _, arg in ipairs(cli_options.to_args(cli_opts)) do
+      table.insert(format_cli_args, arg)
+    end
+
+    --[[
+      @note GitHub Issue: https://github.com/prettier/prettier/issues/13354
+            `--config-precedence=prefer-file` is problematic with cli options
+            for range formatting.
+    --]]
+    if cli_opts.config_precedence ~= "prefer-file" then
+      range_format_cli_args = vim.deepcopy(format_cli_args)
     end
   end
 
   M._generator = null_ls.formatter({
     command = command,
     args = function(params)
-      local args = vim.deepcopy(cli_args)
-
       if params.lsp_method == "textDocument/formatting" then
-        return args
+        return vim.deepcopy(format_cli_args)
       end
+
+      local args = vim.deepcopy(range_format_cli_args)
 
       local content, range = params.content, params.range
 
