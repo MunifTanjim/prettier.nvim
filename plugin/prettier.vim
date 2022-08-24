@@ -3,20 +3,15 @@ if exists('g:loaded_prettier')
 endif
 let g:loaded_prettier = 1
 
-function! s:LSPMethods(...)
-  let methods = ["textDocument/formatting", "textDocument/rangeFormatting"]
-  return join(methods, "\n")
-endfunction
-
 function! s:Format(...)
-  if a:0 == 1 && a:1 ==# "textDocument/rangeFormatting"
+  if a:0 == 1 && a:1 > 0
     lua require("prettier").format("textDocument/rangeFormatting")
   else
     lua require("prettier").format("textDocument/formatting")
   endif
 endfunction
 
-command! -nargs=? -range=% -complete=custom,s:LSPMethods Prettier :call <SID>Format(<f-args>)
+command! -range=% Prettier :call <SID>Format(<range>)
 
 nnoremap <silent> <Plug>(prettier-format) :Prettier textDocument/formatting<CR>
 xnoremap <silent> <Plug>(prettier-format) :Prettier textDocument/rangeFormatting<CR>
