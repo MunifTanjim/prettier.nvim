@@ -9,23 +9,14 @@ local M = {
   _generator = nil,
 }
 
-local function get_generator()
-  if not ok then
-    return
-  end
+local function noop() end
 
-  if M._generator_initialized then
-    return M._generator
-  end
+local function create_generator(opts)
+  local bin = opts.bin
+  local cli_options = opts.cli_options or {}
+  local null_ls_options = opts["null-ls"] or {}
 
-  M._generator_initialized = true
-
-  if vim.tbl_count(options.get("filetypes")) == 0 then
-    return
-  end
-
-  local bin = options.get("bin") --[[@as string]]
-  local command = utils.resolve_bin(bin)
+  local command = utils.resolve_bin(bin, opts.bin_preference)
 
   if not command then
     return
@@ -34,8 +25,6 @@ local function get_generator()
   local format_cli_args = cli.get_base_args(bin)
   local range_format_cli_args = cli.get_base_args(bin)
   if cli.args.supports_options(bin) then
-    local cli_options = options.get("cli_options")
-
     for _, arg in ipairs(cli.args.from_options(cli_options)) do
       table.insert(format_cli_args, arg)
     end
@@ -50,7 +39,7 @@ local function get_generator()
     end
   end
 
-  M._generator = null_ls.formatter({
+  return null_ls.formatter({
     command = command,
     args = function(params)
       if params.lsp_method == "textDocument/formatting" then
@@ -77,93 +66,110 @@ local function get_generator()
       return args
     end,
     to_stdin = true,
-    runtime_condition = options.get("null-ls.runtime_condition"),
-    timeout = options.get("null-ls.timeout"),
+    runtime_condition = null_ls_options["runtime_condition"],
+    timeout = null_ls_options["timeout"],
   })
-
-  return M._generator
 end
 
-function M.format(method)
+function M.create_formatter(opts)
   if not ok then
-    return
+    return noop
   end
 
-  method = method or "textDocument/formatting"
-
-  local generator = get_generator()
+  local generator = create_generator({
+    bin = opts.bin,
+    bin_preference = opts.bin_preference,
+    cli_options = opts.cli_options,
+    ["null-ls"] = opts["null-ls"],
+  })
 
   if not generator then
-    return
+    return noop
   end
 
-  if not M._format then
-    local u = require("null-ls.utils")
+  local u = require("null-ls.utils")
 
-    M._format = function(original_params)
-      local bufnr = original_params.bufnr
+  local function format(original_params)
+    local method = original_params.range and "textDocument/rangeFormatting" or "textDocument/formatting"
+    local bufnr = original_params.bufnr
 
-      local temp_bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_option(temp_bufnr, "eol", vim.api.nvim_buf_get_option(bufnr, "eol"))
-      vim.api.nvim_buf_set_option(temp_bufnr, "fileformat", vim.api.nvim_buf_get_option(bufnr, "fileformat"))
-      vim.api.nvim_buf_set_lines(temp_bufnr, 0, -1, false, vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
+    local temp_bufnr = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(temp_bufnr, "eol", vim.api.nvim_buf_get_option(bufnr, "eol"))
+    vim.api.nvim_buf_set_option(temp_bufnr, "fileformat", vim.api.nvim_buf_get_option(bufnr, "fileformat"))
+    vim.api.nvim_buf_set_lines(temp_bufnr, 0, -1, false, vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
 
-      local function callback()
-        local edits = require("null-ls.diff").compute_diff(
-          u.buf.content(bufnr),
-          u.buf.content(temp_bufnr),
-          u.get_line_ending(bufnr)
-        )
-
-        vim.schedule(function()
-          vim.api.nvim_buf_delete(temp_bufnr, { force = true })
-        end)
-
-        local is_actual_edit = not (edits.newText == "" and edits.rangeLength == 0)
-
-        if is_actual_edit then
-          vim.lsp.util.apply_text_edits({ edits }, bufnr, require("null-ls.client").get_offset_encoding())
-        end
-      end
-
-      require("null-ls.generators").run(
-        { generator },
-        u.make_params(original_params, require("null-ls.methods").map[method]),
-        {
-          sequential = true,
-          postprocess = function(edit, params)
-            edit.row = edit.row or 1
-            edit.col = edit.col or 1
-            edit.end_row = edit.end_row or #params.content + 1
-            edit.end_col = edit.end_col or 1
-
-            edit.range = u.range.to_lsp(edit)
-            edit.newText = edit.text
-          end,
-          after_each = function(edits)
-            vim.lsp.util.apply_text_edits(edits, temp_bufnr, require("null-ls.client").get_offset_encoding())
-          end,
-        },
-        callback
+    local function callback()
+      local edits = require("null-ls.diff").compute_diff(
+        u.buf.content(bufnr),
+        u.buf.content(temp_bufnr),
+        u.get_line_ending(bufnr)
       )
+
+      vim.schedule(function()
+        vim.api.nvim_buf_delete(temp_bufnr, { force = true })
+      end)
+
+      local is_actual_edit = not (edits.newText == "" and edits.rangeLength == 0)
+
+      if is_actual_edit then
+        vim.lsp.util.apply_text_edits({ edits }, bufnr, require("null-ls.client").get_offset_encoding())
+      end
     end
+
+    require("null-ls.generators").run(
+      { generator },
+      u.make_params(original_params, require("null-ls.methods").map[method]),
+      {
+        sequential = true,
+        postprocess = function(edit, params)
+          edit.row = edit.row or 1
+          edit.col = edit.col or 1
+          edit.end_row = edit.end_row or #params.content + 1
+          edit.end_col = edit.end_col or 1
+
+          edit.range = u.range.to_lsp(edit)
+          edit.newText = edit.text
+        end,
+        after_each = function(edits)
+          vim.lsp.util.apply_text_edits(edits, temp_bufnr, require("null-ls.client").get_offset_encoding())
+        end,
+      },
+      callback
+    )
   end
 
-  local bufnr = vim.api.nvim_get_current_buf()
+  local filetypes = opts.filetypes and utils.list_to_map(opts.filetypes)
 
-  local params = {
-    bufnr = bufnr,
-    method = method,
-  }
+  return function(method)
+    local bufnr = vim.api.nvim_get_current_buf()
 
-  if method == "textDocument/rangeFormatting" then
-    params.range = vim.lsp.util.make_given_range_params().range
+    if filetypes and not filetypes[vim.api.nvim_buf_get_option(bufnr, "filetype")] then
+      return
+    end
+
+    local params = {
+      bufnr = bufnr,
+      method = method,
+    }
+
+    if method == "textDocument/rangeFormatting" then
+      params.range = vim.lsp.util.make_given_range_params().range
+    end
+
+    format(params)
   end
-
-  M._format(params)
 end
 
 function M.setup()
+  M.format = M.create_formatter({
+    bin = options.get("bin"),
+    cli_options = options.get("cli_options"),
+    ["null-ls"] = {
+      runtime_condition = options.get("null-ls.runtime_condition"),
+      timeout = options.get("null-ls.timeout"),
+    },
+  })
+
   if not ok then
     return
   end
@@ -178,7 +184,18 @@ function M.setup()
     return
   end
 
-  local generator = get_generator()
+  if vim.tbl_count(options.get("filetypes")) == 0 then
+    return
+  end
+
+  local generator = create_generator({
+    bin = options.get("bin"),
+    cli_options = options.get("cli_options"),
+    ["null-ls"] = {
+      runtime_condition = options.get("null-ls.runtime_condition"),
+      timeout = options.get("null-ls.timeout"),
+    },
+  })
 
   if not generator then
     return
