@@ -71,7 +71,7 @@ local function create_generator(opts)
   })
 end
 
-local function create_formatter(opts)
+function M.create_formatter(opts)
   if not ok then
     return noop
   end
@@ -161,7 +161,7 @@ local function create_formatter(opts)
 end
 
 function M.setup()
-  M.format = create_formatter({
+  M.format = M.create_formatter({
     bin = options.get("bin"),
     cli_options = options.get("cli_options"),
     ["null-ls"] = {
