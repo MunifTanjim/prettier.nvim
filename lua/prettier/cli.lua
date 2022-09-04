@@ -17,7 +17,7 @@ end
 
 local supported_bin = {
   prettier = true,
-  prettierd = false,
+  prettierd = true,
 }
 
 ---@param bin string

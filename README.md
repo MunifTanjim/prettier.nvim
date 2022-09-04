@@ -85,7 +85,7 @@ All the settings are optional.
 local prettier = require("prettier")
 
 prettier.setup({
-  bin = 'prettier', -- or `prettierd`
+  bin = 'prettier', -- or `'prettierd'` (v0.22+)
   filetypes = {
     "css",
     "graphql",
@@ -111,7 +111,7 @@ prettier.setup({
     condition = function()
       return prettier.config_exists({
         -- if `true`, checks `package.json` for `"prettier"` key
-        check_package_json = false, 
+        check_package_json = false,
       })
     end,
     runtime_condition = function(params)
@@ -163,7 +163,7 @@ prettier.setup({
 })
 ```
 
-_**Note**:_ 
+_**Note**:_
   - _You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config file is present in your project directory._
   - _Prettier CLI options are not supported by `prettierd`: [`fsouza/prettierd#237`](https://github.com/fsouza/prettierd/issues/237)._
 
