@@ -108,6 +108,12 @@ You can also supply some options to `null-ls`:
 ```lua
 prettier.setup({
   ["null-ls"] = {
+    condition = function()
+      return prettier.config_exists({
+        -- if `true`, checks `package.json` for `"prettier"` key
+        check_package_json = false, 
+      })
+    end,
     runtime_condition = function(params)
       -- return false to skip running prettier
       return true
@@ -155,7 +161,6 @@ prettier.setup({
     config_precedence = "prefer-file", -- or "cli-override" or "file-override"
   },
 })
-
 ```
 
 _**Note**:_ 

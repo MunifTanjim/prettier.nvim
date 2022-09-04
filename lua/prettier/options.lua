@@ -1,4 +1,3 @@
-local cli = require("prettier.cli")
 local u = require("prettier.utils")
 
 local bins = { "prettier", "prettierd" }
@@ -43,6 +42,9 @@ local default_options = {
     "typescriptreact",
     "yaml",
   },
+  ["null-ls.condition"] = function()
+    return u.config_exists()
+  end,
   cli_options = {
     config_precedence = "prefer-file",
   },
@@ -65,6 +67,11 @@ local function get_validate_argmap(tbl, key)
     ["cli_options"] = {
       tbl["filetypes"],
       "table",
+      true,
+    },
+    ["null-ls.condition"] = {
+      tbl["null-ls.condition"],
+      "function",
       true,
     },
     ["null-ls.runtime_condition"] = {

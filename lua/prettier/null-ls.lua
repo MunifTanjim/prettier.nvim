@@ -174,10 +174,6 @@ function M.setup()
     return
   end
 
-  if not utils.prettier_enabled() then
-    return
-  end
-
   local generator = get_generator()
 
   if not generator then
@@ -185,6 +181,7 @@ function M.setup()
   end
 
   null_ls.register({
+    condition = options.get("null-ls.condition"),
     filetypes = options.get("filetypes"),
     generator = generator,
     method = { null_ls.methods.FORMATTING, null_ls.methods.RANGE_FORMATTING },

@@ -1,7 +1,10 @@
 local options = require("prettier.options")
 local null_ls = require("prettier.null-ls")
+local utils = require("prettier.utils")
 
-local M = {}
+local M = {
+  config_exits = utils.config_exists,
+}
 
 function M.setup(user_options)
   options.setup(user_options)
