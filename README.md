@@ -110,8 +110,8 @@ prettier.setup({
   ["null-ls"] = {
     condition = function()
       return prettier.config_exists({
-        -- if `true`, checks `package.json` for `"prettier"` key
-        check_package_json = false,
+        -- if `false`, skips checking `package.json` for `"prettier"` key
+        check_package_json = true,
       })
     end,
     runtime_condition = function(params)

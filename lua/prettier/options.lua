@@ -43,7 +43,9 @@ local default_options = {
     "yaml",
   },
   ["null-ls.condition"] = function()
-    return u.config_exists()
+    return u.config_exists({
+      check_package_json = true,
+    })
   end,
   cli_options = {
     config_precedence = "prefer-file",
