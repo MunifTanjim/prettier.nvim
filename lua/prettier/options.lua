@@ -117,7 +117,7 @@ function M.setup(user_options)
     return
   end
 
-  user_options = u.tbl_flatten(user_options, should_flatten)
+  user_options = u.tbl_flatten(user_options or {}, should_flatten)
 
   validate_options(user_options)
 
