@@ -101,7 +101,7 @@ All the settings are optional.
 local prettier = require("prettier")
 
 prettier.setup({
-  bin = 'prettier', -- or `'prettierd'` (v0.22+)
+  bin = 'prettier', -- or `'prettierd'` (v0.23.3+)
   filetypes = {
     "css",
     "graphql",
@@ -181,7 +181,7 @@ prettier.setup({
 
 _**Note**:_
   - _You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config file is present in your project directory._
-  - _Supported version of `prettierd` is `0.22+`._
+  - _Supported version of `prettierd` is `0.23.3+`._
 
 ## Setup without LSP
 
