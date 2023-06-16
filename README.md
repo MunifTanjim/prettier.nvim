@@ -30,6 +30,11 @@ use('MunifTanjim/prettier.nvim')
 
 ## Setup
 
+> **Warning**
+>
+> Prettier won't be automatically installed by this plugin.
+> You need to have it installed either globally or locally for the project.
+
 ### Setting up `null-ls`
 
 For Latest Neovim:
@@ -90,6 +95,7 @@ null_ls.setup({
   end,
 })
 ```
+
 </details>
 
 ### Setting Up `prettier.nvim`
@@ -118,6 +124,10 @@ prettier.setup({
   },
 })
 ```
+
+> **Note**
+>
+> It's highly recommended that you use this plugin with [`prettierd`](https://github.com/fsouza/prettierd).
 
 You can also supply some options to `null-ls`:
 
@@ -180,8 +190,9 @@ prettier.setup({
 ```
 
 _**Note**:_
-  - _You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config file is present in your project directory._
-  - _Supported version of `prettierd` is `0.23.3+`._
+
+- _You can only use `prettier.nvim` with `vim.lsp.*` methods if prettier config file is present in your project directory._
+- _Supported version of `prettierd` is `0.23.3+`._
 
 ## Setup without LSP
 
