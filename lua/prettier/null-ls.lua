@@ -28,6 +28,12 @@ local function get_generator()
   local command = utils.resolve_bin(bin)
 
   if not command then
+    vim.schedule(function()
+      vim.notify(
+        string.format("[prettier.nvim] '%s' not found. Did you forget to install it?", bin),
+        vim.log.levels.WARN
+      )
+    end)
     return
   end
 
