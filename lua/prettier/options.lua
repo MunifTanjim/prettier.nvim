@@ -1,6 +1,6 @@
 local u = require("prettier.utils")
 
-local bins = { "prettier", "prettierd" }
+local bins = { "prettier", "prettierd", "prettier_d_slim", }
 
 local top_level_cli_options = {
   "config_precedence",
