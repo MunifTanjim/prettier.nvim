@@ -7,6 +7,7 @@ local cli = {
 local base_args_by_bin = {
   prettier = { "--stdin-filepath", "$FILENAME" },
   prettierd = { "$FILENAME" },
+  prettier_d_slim = { "--stdin", "--stdin-filepath", "$FILENAME" },
 }
 
 ---@param bin string
@@ -18,6 +19,7 @@ end
 local supported_bin = {
   prettier = true,
   prettierd = true,
+  prettier_d_slim = true,
 }
 
 ---@param bin string
