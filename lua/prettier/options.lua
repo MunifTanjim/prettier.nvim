@@ -101,11 +101,13 @@ local function validate_options(user_options)
   vim.validate(get_validate_argmap(user_options))
 end
 
+local islist = vim.islist or vim.tbl_islist
+
 local function should_flatten(key, value, depth)
   local skip_key = {
     cli_options = true,
   }
-  return not skip_key[key] and not vim.tbl_islist(value) and depth < 7
+  return not skip_key[key] and not islist(value) and depth < 7
 end
 
 local options = vim.deepcopy(u.tbl_flatten(default_options, should_flatten))

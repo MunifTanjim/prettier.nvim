@@ -54,9 +54,11 @@ function M.resolve_bin(cmd)
   return nil
 end
 
+local islist = vim.islist or vim.tbl_islist
+
 function M.tbl_flatten(tbl, should_flatten, result, prefix, depth)
   should_flatten = should_flatten or function(_, value)
-    return not vim.tbl_islist(value) and depth < 42
+    return not islist(value) and depth < 42
   end
 
   result = result or {}
